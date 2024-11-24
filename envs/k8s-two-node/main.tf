@@ -48,7 +48,7 @@ resource "aws_security_group" "k8s_sg" {
   description = "Security group for Kubernetes EC2 instances"
 
   ingress {
-    # Allow SSH access (for management and troubleshooting)
+    # Allow SSH access 
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
@@ -56,7 +56,21 @@ resource "aws_security_group" "k8s_sg" {
   }
 
   ingress {
-    # Allow access to Kubernetes API (Master Node)
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]  
+  }
+
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]  
+  }
+
+  ingress {
+    # Kubernetes API
     from_port   = 6443
     to_port     = 6443
     protocol    = "tcp"
@@ -64,7 +78,15 @@ resource "aws_security_group" "k8s_sg" {
   }
 
   ingress {
-    # Allow communication between nodes (pods need to communicate across nodes)
+    # Etcd server client API
+    from_port   = 2379
+    to_port     = 2380
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    # Kubelet API
     from_port   = 10250
     to_port     = 10250
     protocol    = "tcp"
@@ -72,18 +94,51 @@ resource "aws_security_group" "k8s_sg" {
   }
 
   ingress {
-    # Allow communication for Flannel VXLAN (if using Flannel CNI)
-    from_port   = 8472
-    to_port     = 8472
-    protocol    = "udp"
+    # Kube-Scheduler
+    from_port   = 10259
+    to_port     = 10259
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  ingress {
+    # Kube-controller manager
+    from_port   = 10257
+    to_port     = 10257
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    # Kube-proxy manager
+    from_port   = 10256
+    to_port     = 10256
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
 
   ingress {
     # Allow communication for NodePort services
     from_port   = 30000
     to_port     = 32767
     protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    # Calico Border Gateway Protocol
+    from_port   = 179
+    to_port     = 179
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    # Calico VXLAN
+    from_port   = 4789
+    to_port     = 4789
+    protocol    = "udp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
