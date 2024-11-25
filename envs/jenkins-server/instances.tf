@@ -24,18 +24,23 @@ resource "aws_instance" "jenkins-server" {
 
   provisioner "remote-exec" {
     inline = [
-        # Wait until the Jenkins token file exists
-        "while [ ! -f /home/ubuntu/jenkins_token.txt ]; do sleep 5; done",
-        
-        # Print the Jenkins token to the Terraform logs
-        "cat /home/ubuntu/jenkins_token.txt"
+      # Wait until the Jenkins token file exists
+      "while [ ! -f /home/ubuntu/jenkins_token.txt ]; do sleep 5; done",
+
+      # Print the Jenkins token to the Terraform logs
+      "echo '#################### JENKINS TOKEN ####################'",
+      "cat /home/ubuntu/jenkins_token.txt",
+      "echo '#################### JENKINS TOKEN ####################'"
+
     ]
 
     connection {
-        type        = "ssh"
-        user        = "ubuntu"
-        private_key = file(var.private_key_file)
-        host        = self.public_ip
+      type        = "ssh"
+      user        = "ubuntu"
+      private_key = file(var.private_key_file)
+      host        = self.public_ip
     }
-  }      
+  }
+
 }
+
