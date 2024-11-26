@@ -11,7 +11,10 @@ resource "aws_instance" "jenkins-server" {
     echo "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian-stable binary/" | sudo tee /etc/apt/sources.list.d/jenkins.list > /dev/null
     sudo apt-get update -y && sudo apt-get install jenkins -y
     sudo cat /var/lib/jenkins/secrets/initialAdminPassword > /home/ubuntu/jenkins_token.txt
-  EOF
+    sudo apt-get update  && sudo apt install docker.io -y && sudo systemctl start docker && sudo systemctl enable docker
+    sudo usermod -aG docker jenkins
+    sudo systemctl restart jenkins
+    EOF
 
   root_block_device {
     volume_size = 10
@@ -44,3 +47,12 @@ resource "aws_instance" "jenkins-server" {
 
 }
 
+resource "aws_eip" "jenkins-server-eip" {
+  instance = aws_instance.jenkins-server.id
+}
+
+
+resource "aws_ec2_instance_state" "check_running" {
+  instance_id = aws_instance.jenkins-server.id
+  state = "running"
+}
